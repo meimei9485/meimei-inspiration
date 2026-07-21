@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEIMEI INSPIRATION</title>
+    <!-- 引入衬线字体 (Logo使用, 加上了700粗体) 和无衬线字体 (全局正文使用) -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --text-main: #111;
+            --text-light: #999;
+            --bg-main: #FAFAFA;
+            --border-color: #E2E2E2;
+            --left-sidebar-width: 260px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Jost', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+        button { background: none; border: none; cursor: pointer; font-family: inherit; }
+        
+        /* --- 顶部固定头部 (Header) --- */
+        .top-header {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            height: 80px;
+            background-color: rgba(250, 250, 250, 0.95);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 3rem;
+            z-index: 150;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        /* 居中粗体 Logo */
+        .logo {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            font-weight: 700; /* 字体加粗 */
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        /* 左右两侧交互按钮 */
+        .header-btn {
+            font-size: 1.2rem;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            transition: color 0.3s;
+        }
+        .header-btn:hover { color: var(--text-light); }
+        .filter-btn { font-size: 0.8rem; letter-spacing: 0.15em; font-weight: 500;}
+
+        /* --- 页面整体布局 --- */
+        .layout-container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+            position: relative;
+        }
+
+        /* --- 左侧分类导航 (默认显示可隐藏) --- */
+        .left-sidebar {
+            position: fixed;
+            top: 80px; /* 在Header下方 */
+            left: 0;
+            width: var(--left-sidebar-width);
+            height: calc(100vh - 80px);
+            padding: 4rem 3rem;
+            background-color: var(--bg-main);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateX(0); /* 默认显示状态 */
+            z-index: 100;
+        }
+        /* 隐藏状态 */
+        .left-sidebar.hidden {
+            transform: translateX(-100%);
+        }
+
+        .category-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+        .category-nav button {
+            font-size: 0.9rem;
+            letter-spacing: 0.15em;
+            color: var(--text-light);
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .category-nav button:hover, .category-nav button.active {
+            color: var(--text-main);
+            font-weight: 500;
+        }
+        /* 左边小横线提示当前分类 */
+        .category-nav button.active::before {
+            content: '';
+            position: absolute;
+            left: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 1px;
+            background-color: var(--text-main);
+        }
+
+        /* --- 主内容区 (瀑布流) --- */
+        .main-content {
+            margin-left: var(--left-sidebar-width); /* 为左栏让出空间 */
+            padding: 4rem 3rem;
+            width: calc(100% - var(--left-sidebar-width));
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        /* 当左侧栏隐藏时，主区域向左扩张 */
+        .main-content.expanded {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        .masonry-grid { column-count: 3; column-gap: 3rem; }
+        @media (max-width: 1200px) { .masonry-grid { column-count: 2; column-gap: 2rem;} }
+        @media (max-width: 768px) { 
+            .top-header { padding: 0 1.5rem; }
+            .logo { font-size: 1.5rem; }
+            .masonry-grid { column-count: 1; }
+            .left-sidebar { transform: translateX(-100%); } /* 手机默认隐藏左侧 */
+            .main-content { margin-left: 0; width: 100%; padding: 2rem 1.5rem; }
+            .main-content.expanded { margin-left: auto; }
+        }
+
+        .item { break-inside: avoid; margin-bottom: 3rem; position: relative; cursor: zoom-in; }
+        .item img { width: 100%; display: block; transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        .item:hover img { transform: scale(1.03); }
+        .item[data-type="video"]::after {
+            content: 'PLAY ▼'; position: absolute; bottom: 20px; right: 20px;
+            background: #fff; color: #000; padding: 6px 14px;
+            font-size: 10px; letter-spacing: 1px; border-radius: 20px;
+        }
+
+        /* --- 右侧隐藏抽屉 (过滤器/打标签) --- */
+        .right-filter {
+            position: fixed; top: 0; right: 0; width: 400px; height: 100vh;
+            background-color: #fff; z-index: 200; padding: 3rem 2.5rem;
+            box-shadow: -10px 0 40px rgba(0,0,0,0.05);
+            transform: translateX(100%); /* 默认藏在右边 */
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-y: auto;
+        }
+        .right-filter.active { transform: translateX(0); }
+        
+        .drawer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;}
+        .drawer-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; }
+        .drawer-close { font-size: 2.2rem; font-weight: 300; }
+
+        .tags { display: flex; flex-wrap: wrap; gap: 10px; }
+        .tags button {
+            border: 1px solid var(--border-color); padding: 8px 18px; border-radius: 20px;
+            font-size: 0.8rem; letter-spacing: 0.05em; transition: all 0.2s;
+        }
+        .tags button:hover, .tags button.active {
+            background-color: var(--text-main); color: white; border-color: var(--text-main);
+        }
+
+        /* 遮罩层 (仅在右侧弹出时启用) */
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.2); z-index: 190; display: none; opacity: 0; transition: opacity 0.4s;
+        }
+        .overlay.active { display: block; opacity: 1; }
+
+        /* --- 全屏详情灯箱 --- */
+        .lightbox {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.98); z-index: 1000;
+            display: none; justify-content: center; align-items: center;
+        }
+        .lightbox.active { display: flex; }
+        .lightbox-close { position: absolute; top: 1.5rem; right: 3rem; font-size: 3.5rem; font-weight: 300; cursor: pointer; }
+        .lightbox-content { max-width: 90%; max-height: 90vh; object-fit: contain; }
+    </style>
+</head>
+<body>
+
+    <!-- 顶部固定头部 -->
+    <header class="top-header">
+        <!-- ☰ 三道杠图标，用来收起/展开左边菜单 -->
+        <button class="header-btn" id="toggleLeftBtn">☰</button>
+        <div class="logo">MEIMEI INSPIRATION</div>
+        <!-- 依然保留在右上角的关键词筛选按钮 -->
+        <button class="header-btn filter-btn" id="openFilterBtn">FILTERS ＋</button>
+    </header>
+
+    <div class="layout-container">
+        <!-- 左侧导航 (去掉了多余字样，直接纯英文类别) -->
+        <aside class="left-sidebar" id="leftSidebar">
+            <nav class="category-nav">
+                <button class="cat-btn active" data-cat="all">ALL</button>
+                <button class="cat-btn" data-cat="picture">PICTURES</button>
+                <button class="cat-btn" data-cat="video">VIDEOS</button>
+                <button class="cat-btn" data-cat="makeup">MAKEUP</button>
+            </nav>
+        </aside>
+
+        <!-- 主区域 (图片瀑布流) -->
+        <main class="main-content" id="mainContent">
+            <div class="masonry-grid" id="grid">
+                <!-- 图片渲染处 -->
+            </div>
+        </main>
+    </div>
+
+    <!-- 遮罩层 (打开右侧过滤器时变暗背景) -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- 右侧隐藏菜单 (过滤器) -->
+    <aside class="right-filter" id="rightFilter">
+        <div class="drawer-header">
+            <h2 class="drawer-title">Keywords Filter</h2>
+            <button class="drawer-close" id="closeFilterBtn">×</button>
+        </div>
+        <div class="tags" id="tagsContainer"></div>
+    </aside>
+
+    <!-- 放大灯箱 -->
+    <div class="lightbox" id="lightbox">
+        <span class="lightbox-close" id="closeLightbox">×</span>
+        <img src="" alt="View" class="lightbox-content" id="lightboxImg">
+    </div>
+
+<script>
+    // === 测试数据 ===
+    const inspirationData = [
+        { type: 'picture', tags: ['Retro', 'Fashion'], url: 'https://images.unsplash.com/photo-1495385794356-15371f348c31?w=800' },
+        { type: 'makeup', tags: ['Red Lips', 'Classic'], url: 'https://images.unsplash.com/photo-1512413914439-012989d6e42b?w=800' },
+        { type: 'video', tags: ['Runway', 'Vogue'], url: 'https://images.unsplash.com/photo-1509653760469-80dff8db9405?w=800' }, 
+        { type: 'picture', tags: ['Minimalist', 'Black & White'], url: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800' },
+        { type: 'makeup', tags: ['Glitter', 'Editorial'], url: 'https://images.unsplash.com/photo-1542452255191-c85a98f2c5d1?w=800' },
+        { type: 'picture', tags: ['Fashion', 'Editorial'], url: 'https://images.unsplash.com/photo-1550614000-4b95f265cb46?w=800' },
+        { type: 'video', tags: ['Lighting'], url: 'https://images.unsplash.com/photo-1536243298747-ea8874136664?w=800' },
+        { type: 'makeup', tags: ['Natural'], url: 'https://images.unsplash.com/photo-1596704017254-9b121068fb31?w=800' }
+    ];
+
+    // 获取DOM元素
+    const grid = document.getElementById('grid');
+    const tagsContainer = document.getElementById('tagsContainer');
+    const catBtns = document.querySelectorAll('.cat-btn');
+    const toggleLeftBtn = document.getElementById('toggleLeftBtn');
+    const leftSidebar = document.getElementById('leftSidebar');
+    const mainContent = document.getElementById('mainContent');
+    const rightFilter = document.getElementById('rightFilter');
+    const overlay = document.getElementById('overlay');
+
+    let currentCategory = 'all';
+    let currentTag = '';
+    const allTags = [...new Set(inspirationData.flatMap(item => item.tags))];
+
+    // --- 左侧导航栏 收起/展开 功能 ---
+    toggleLeftBtn.addEventListener('click', () => {
+        // 手机端判断逻辑
+        if (window.innerWidth <= 768) {
+            if (leftSidebar.style.transform === 'translateX(0px)') {
+                leftSidebar.style.transform = 'translateX(-100%)';
+            } else {
+                leftSidebar.style.transform = 'translateX(0px)';
+            }
+        } else {
+            // 电脑端判断逻辑
+            leftSidebar.classList.toggle('hidden');
+            mainContent.classList.toggle('expanded');
+        }
+    });
+
+    // 渲染图片
+    function renderGrid() {
+        grid.innerHTML = '';
+        let filteredData = inspirationData.filter(item => {
+            const matchCategory = currentCategory === 'all' || item.type === currentCategory;
+            const matchTag = currentTag === '' || item.tags.includes(currentTag);
+            return matchCategory && matchTag;
+        });
+
+        filteredData.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'item';
+            div.dataset.type = item.type;
+            div.innerHTML = `<img src="${item.url}" loading="lazy" alt="Image">`;
+            div.addEventListener('click', () => openLightbox(item.url));
+            grid.appendChild(div);
+        });
+    }
+
+    // 渲染右侧过滤标签
+    function renderTags() {
+        tagsContainer.innerHTML = '';
+        allTags.forEach(tag => {
+            const btn = document.createElement('button');
+            btn.textContent = tag.toUpperCase();
+            btn.onclick = () => {
+                if(currentTag === tag) {
+                    currentTag = ''; 
+                    btn.classList.remove('active');
+                } else {
+                    currentTag = tag;
+                    document.querySelectorAll('.tags button').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                }
+                renderGrid();
+            };
+            tagsContainer.appendChild(btn);
+        });
+    }
+
+    // 左侧分类点击事件
+    catBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            catBtns.forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            currentCategory = e.target.dataset.cat;
+            currentTag = '';
+            document.querySelectorAll('.tags button').forEach(b => b.classList.remove('active'));
+            renderGrid();
+        });
+    });
+
+    // --- 右侧 Filter 打开/关闭功能 ---
+    function toggleFilterDrawer(show) {
+        if(show) {
+            rightFilter.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        } else {
+            rightFilter.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+    }
+    
+    document.getElementById('openFilterBtn').onclick = () => toggleFilterDrawer(true);
+    document.getElementById('closeFilterBtn').onclick = () => toggleFilterDrawer(false);
+    overlay.onclick = () => toggleFilterDrawer(false);
+
+    // --- 灯箱大图展示 ---
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+
+    function openLightbox(url) {
+        lightboxImg.src = url;
+        lightbox.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    document.getElementById('closeLightbox').onclick = () => {
+        lightbox.classList.remove('active');
+        lightboxImg.src = '';
+        document.body.style.overflow = 'auto';
+    }
+
+    // 页面初始化
+    renderTags();
+    renderGrid();
+</script>
+</body>
+</html>
