@@ -104,6 +104,8 @@
             <nav class="category-nav">
                 <button class="cat-btn active" data-cat="all">ALL</button>
                 <button class="cat-btn" data-cat="picture">PICTURES</button>
+                <!-- 新增迪士尼公主风分类按钮 -->
+                <button class="cat-btn" data-cat="disney-princess">DISNEY PRINCESS STYLE</button>
             </nav>
         </aside>
 
@@ -153,14 +155,48 @@
                 { title: '5. 装饰属性', desc: '适配奶油风、少女卧室软装，受众为喜爱手工、甜系治愈风格的年轻女性。' }
             ]
         },
-        // ↓ 其他图片 (如果你未来想写分析，就照着上面大括号里的格式写写，如果没有，就照旧留空)
+        // ↓ 原有其他图片数据保留不动
         { id: 'pic2', type: 'picture', tags: ['Abstract', 'Color'], url: 'pic2.png' },
         { id: 'pic3', type: 'picture', tags: ['Craft', 'Detail'], url: 'pic3.png' },
         { id: 'pic4', type: 'picture', tags: ['Landscape', 'Night'], url: 'pic4.png' },
         { id: 'pic5', type: 'picture', tags: ['Night', 'Art'], url: 'pic5.png' },
         { id: 'pic6', type: 'picture', tags: ['Winter', 'House'], url: 'pic6.png' },
         { id: 'pic7', type: 'picture', tags: ['Figures', 'Art'], url: 'pic7.png' },
-        { id: 'pic8', type: 'picture', tags: ['Couple', 'Style'], url: 'pic8.png' }
+        { id: 'pic8', type: 'picture', tags: ['Couple', 'Style'], url: 'pic8.png' },
+        // ========== 新增迪士尼公主风3条素材 ==========
+        {
+            id: 'princess1',
+            type: 'disney-princess',
+            tags: ['Disney Princess', 'Princess Makeup', 'Pink Aesthetic', 'Lolita'],
+            url: 'media/makeup.jpeg',
+            title: 'Princess Romantic Makeup',
+            details: [
+                { title: '风格主题', desc: '迪士尼公主温柔甜妆，粉调腮红+大朵玫瑰发饰，复古柔焦少女氛围感。' },
+                { title: '适用场景', desc: '公主风钻石画、洛丽塔穿搭参考、少女手作灵感。' }
+            ]
+        },
+        {
+            id: 'princess2',
+            type: 'disney-princess',
+            tags: ['Disney Princess', 'Princess Dress', 'Pink Gown', 'Vintage'],
+            url: 'media/dress.mp4',
+            title: 'Vintage Princess Dress Display',
+            details: [
+                { title: '风格主题', desc: '复古粉白泡泡袖公主礼裙，褶皱蕾丝设计，经典迪士尼公主裙版型参考。' },
+                { title: '适用场景', desc: '服装钻石画、布艺手工、少女软装设计素材。' }
+            ]
+        },
+        {
+            id: 'princess3',
+            type: 'disney-princess',
+            tags: ['Disney Princess', 'Princess Hairstyle', 'Floral Hair', 'Cute'],
+            url: 'media/hairstyle.mp4',
+            title: 'Floral Princess Hairstyle',
+            details: [
+                { title: '风格主题', desc: '温柔大波浪鲜花公主发型，浅棕渐变发色，田园童话公主造型。' },
+                { title: '适用场景', desc: '人物钻石画发型参考、少女妆造手作灵感。' }
+            ]
+        }
     ];
 
     const grid = document.getElementById('grid');
@@ -197,7 +233,12 @@
             const div = document.createElement('div');
             div.className = 'item';
             div.dataset.type = item.type;
-            div.innerHTML = `<img src="${item.url}" loading="lazy" alt="Image">`;
+            // 判断是视频还是图片，视频自动适配播放器
+            if(item.url.endsWith('.mp4')){
+                div.innerHTML = `<video style="width:100%;display:block;" controls loading="lazy"><source src="${item.url}" type="video/mp4"></video>`;
+            }else{
+                div.innerHTML = `<img src="${item.url}" loading="lazy" alt="Image">`;
+            }
             
             // 重要改动：点击时，把这个图片包含的所有信息(item)传递过去！
             div.addEventListener('click', () => openLightbox(item));
@@ -249,8 +290,15 @@
     const lightboxText = document.getElementById('lightboxText');
 
     function openLightbox(itemData) {
-        // 1. 设置左侧图片
-        lightboxImg.src = itemData.url;
+        // 区分视频/图片，弹窗加载对应资源
+        if(itemData.url.endsWith('.mp4')){
+            lightboxImg.outerHTML = `<video id="lightboxMedia" style="max-width:100%;max-height:90vh;box-shadow:0 10px 40px rgba(0,0,0,0.1);" controls autoplay><source src="${itemData.url}" type="video/mp4"></video>`;
+        }else{
+            // 恢复图片标签
+            const mediaBox = document.querySelector('.lightbox-image-box');
+            mediaBox.innerHTML = `<img src="" alt="View" id="lightboxImg">`;
+            lightboxImg.src = itemData.url;
+        }
         
         // 2. 组装右侧文字内容HTML
         let contentHTML = '';
@@ -286,6 +334,9 @@
 
     document.getElementById('closeLightbox').onclick = () => {
         lightbox.classList.remove('active');
+        // 清空视频停止播放，恢复图片标签
+        const mediaBox = document.querySelector('.lightbox-image-box');
+        mediaBox.innerHTML = `<img src="" alt="View" id="lightboxImg">`;
         lightboxImg.src = '';
         document.body.style.overflow = 'auto';
     }
