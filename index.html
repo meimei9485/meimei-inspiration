@@ -104,7 +104,7 @@
             <nav class="category-nav">
                 <button class="cat-btn active" data-cat="all">ALL</button>
                 <button class="cat-btn" data-cat="picture">PICTURES</button>
-                <!-- 新增迪士尼公主风分类按钮 -->
+                <!-- 迪士尼公主风导航按钮 -->
                 <button class="cat-btn" data-cat="disney-princess">DISNEY PRINCESS STYLE</button>
             </nav>
         </aside>
@@ -138,15 +138,14 @@
     </div>
 
 <script>
-    // === 核心数据区 ===
+    // === 核心数据区（路径全部修正为根目录，无media文件夹） ===
     const inspirationData = [
         { 
             id: 'pic1',
             type: 'picture', 
-            tags: ['粉系花仙', '空灵治愈', '人花共生', '柔焦唯美', '童话奇幻', '曲线装饰插画'], // 基于你的词语提取了标签
+            tags: ['粉系花仙', '空灵治愈', '人花共生', '柔焦唯美', '童话奇幻', '曲线装饰插画'],
             url: 'pic1.png',
             title: '精简多维度拆解',
-            // 下面就是图一专属的深度分析内容！
             details: [
                 { title: '1. 人物主题', desc: '花仙少女半身意象，人花相融，神态空灵温柔，走治愈幻想路线，仅保留面部核心视觉，氛围感朦胧柔和。' },
                 { title: '2. 色彩搭配', desc: '以多层次粉调为主，青绿色花叶冷色中和甜腻，浅米色画布打底，整体色调统一温润，梦幻柔和不刺眼。' },
@@ -155,7 +154,6 @@
                 { title: '5. 装饰属性', desc: '适配奶油风、少女卧室软装，受众为喜爱手工、甜系治愈风格的年轻女性。' }
             ]
         },
-        // ↓ 原有其他图片数据保留不动
         { id: 'pic2', type: 'picture', tags: ['Abstract', 'Color'], url: 'pic2.png' },
         { id: 'pic3', type: 'picture', tags: ['Craft', 'Detail'], url: 'pic3.png' },
         { id: 'pic4', type: 'picture', tags: ['Landscape', 'Night'], url: 'pic4.png' },
@@ -163,12 +161,12 @@
         { id: 'pic6', type: 'picture', tags: ['Winter', 'House'], url: 'pic6.png' },
         { id: 'pic7', type: 'picture', tags: ['Figures', 'Art'], url: 'pic7.png' },
         { id: 'pic8', type: 'picture', tags: ['Couple', 'Style'], url: 'pic8.png' },
-        // ========== 新增迪士尼公主风3条素材 ==========
+        // ========== 迪士尼公主风素材（路径已修正为根目录） ==========
         {
             id: 'princess1',
             type: 'disney-princess',
             tags: ['Disney Princess', 'Princess Makeup', 'Pink Aesthetic', 'Lolita'],
-            url: 'media/makeup.jpeg',
+            url: 'makeup.jpeg',
             title: 'Princess Romantic Makeup',
             details: [
                 { title: '风格主题', desc: '迪士尼公主温柔甜妆，粉调腮红+大朵玫瑰发饰，复古柔焦少女氛围感。' },
@@ -179,7 +177,7 @@
             id: 'princess2',
             type: 'disney-princess',
             tags: ['Disney Princess', 'Princess Dress', 'Pink Gown', 'Vintage'],
-            url: 'media/dress.mp4',
+            url: 'dress.mp4',
             title: 'Vintage Princess Dress Display',
             details: [
                 { title: '风格主题', desc: '复古粉白泡泡袖公主礼裙，褶皱蕾丝设计，经典迪士尼公主裙版型参考。' },
@@ -190,7 +188,7 @@
             id: 'princess3',
             type: 'disney-princess',
             tags: ['Disney Princess', 'Princess Hairstyle', 'Floral Hair', 'Cute'],
-            url: 'media/hairstyle.mp4',
+            url: 'hairstyle.mp4',
             title: 'Floral Princess Hairstyle',
             details: [
                 { title: '风格主题', desc: '温柔大波浪鲜花公主发型，浅棕渐变发色，田园童话公主造型。' },
@@ -221,6 +219,7 @@
         }
     });
 
+    // 修复版网格渲染，完美兼容图片+视频
     function renderGrid() {
         grid.innerHTML = '';
         let filteredData = inspirationData.filter(item => {
@@ -233,14 +232,14 @@
             const div = document.createElement('div');
             div.className = 'item';
             div.dataset.type = item.type;
-            // 判断是视频还是图片，视频自动适配播放器
             if(item.url.endsWith('.mp4')){
-                div.innerHTML = `<video style="width:100%;display:block;" controls loading="lazy"><source src="${item.url}" type="video/mp4"></video>`;
+                div.innerHTML = `
+                <video style="width:100%;display:block;object-fit:cover;" loading="lazy" muted preload="metadata">
+                    <source src="${item.url}" type="video/mp4">
+                </video>`;
             }else{
-                div.innerHTML = `<img src="${item.url}" loading="lazy" alt="Image">`;
+                div.innerHTML = `<img src="${item.url}" loading="lazy" alt="Art Image" style="width:100%;display:block;">`;
             }
-            
-            // 重要改动：点击时，把这个图片包含的所有信息(item)传递过去！
             div.addEventListener('click', () => openLightbox(item));
             grid.appendChild(div);
         });
@@ -284,26 +283,24 @@
     document.getElementById('closeFilterBtn').onclick = () => toggleFilterDrawer(false);
     overlay.onclick = () => toggleFilterDrawer(false);
 
-    // --- 🎨处理点击后的数据渲染逻辑 ---
+    // 修复弹窗视频/图片切换逻辑
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightboxImg');
     const lightboxText = document.getElementById('lightboxText');
 
     function openLightbox(itemData) {
-        // 区分视频/图片，弹窗加载对应资源
+        const mediaBox = document.querySelector('.lightbox-image-box');
+        mediaBox.innerHTML = '';
         if(itemData.url.endsWith('.mp4')){
-            lightboxImg.outerHTML = `<video id="lightboxMedia" style="max-width:100%;max-height:90vh;box-shadow:0 10px 40px rgba(0,0,0,0.1);" controls autoplay><source src="${itemData.url}" type="video/mp4"></video>`;
+            mediaBox.innerHTML = `
+            <video id="lightboxMedia" style="max-width:100%;max-height:90vh;box-shadow:0 10px 40px rgba(0,0,0,0.1);" controls>
+                <source src="${itemData.url}" type="video/mp4">
+            </video>`;
         }else{
-            // 恢复图片标签
-            const mediaBox = document.querySelector('.lightbox-image-box');
-            mediaBox.innerHTML = `<img src="" alt="View" id="lightboxImg">`;
-            lightboxImg.src = itemData.url;
+            mediaBox.innerHTML = `<img src="${itemData.url}" alt="View" id="lightboxImg" style="max-width:100%;max-height:90vh;box-shadow:0 10px 40px rgba(0,0,0,0.1);">`;
         }
-        
-        // 2. 组装右侧文字内容HTML
+
         let contentHTML = '';
-        
-        // 如果这幅画配了深度分析文本，就渲染出来
         if (itemData.details) {
             contentHTML += `<h2 class="detail-title">${itemData.title || 'Inspiration Details'}</h2>`;
             itemData.details.forEach(detail => {
@@ -313,28 +310,21 @@
                 `;
             });
         } else {
-            // 如果没写分析，就给个提示
             contentHTML += `<h2 class="detail-title">Visual Inspiration</h2>
                             <p class="detail-desc" style="color:#999; font-style:italic;">No detailed analysis provided for this item yet.</p>`;
         }
-
-        // 把标签词渲染在最下方
         if (itemData.tags && itemData.tags.length > 0) {
             contentHTML += `<div class="detail-tags-title">Style Keywords</div><div class="detail-tags">`;
             itemData.tags.forEach(t => contentHTML += `<span># ${t}</span>`);
             contentHTML += `</div>`;
         }
-
         lightboxText.innerHTML = contentHTML;
-
-        // 3. 显示图层
         lightbox.classList.add('active');
         document.body.style.overflow = 'hidden';
     }
 
     document.getElementById('closeLightbox').onclick = () => {
         lightbox.classList.remove('active');
-        // 清空视频停止播放，恢复图片标签
         const mediaBox = document.querySelector('.lightbox-image-box');
         mediaBox.innerHTML = `<img src="" alt="View" id="lightboxImg">`;
         lightboxImg.src = '';
