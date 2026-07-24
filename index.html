@@ -138,30 +138,8 @@
     </div>
 
 <script>
-    // === 核心数据区（路径全部修正为根目录，无media文件夹） ===
+    // === 核心数据区：仅保留可用的迪士尼公主素材，删除全部失效pic1-pic8 ===
     const inspirationData = [
-        { 
-            id: 'pic1',
-            type: 'picture', 
-            tags: ['粉系花仙', '空灵治愈', '人花共生', '柔焦唯美', '童话奇幻', '曲线装饰插画'],
-            url: 'pic1.png',
-            title: '精简多维度拆解',
-            details: [
-                { title: '1. 人物主题', desc: '花仙少女半身意象，人花相融，神态空灵温柔，走治愈幻想路线，仅保留面部核心视觉，氛围感朦胧柔和。' },
-                { title: '2. 色彩搭配', desc: '以多层次粉调为主，青绿色花叶冷色中和甜腻，浅米色画布打底，整体色调统一温润，梦幻柔和不刺眼。' },
-                { title: '3. 构图结构', desc: '竖向中心构图，花卉环绕包裹人物形成视觉闭环；花叶虚实穿插制造层次，四周留白，画面轻盈不拥挤。' },
-                { title: '4. 艺术表现', desc: '全曲线柔化轮廓，水彩晕染手绘质感；结合钻石画闪钻肌理，融合日系唯美插画与童话装饰画风。' },
-                { title: '5. 装饰属性', desc: '适配奶油风、少女卧室软装，受众为喜爱手工、甜系治愈风格的年轻女性。' }
-            ]
-        },
-        { id: 'pic2', type: 'picture', tags: ['Abstract', 'Color'], url: 'pic2.png' },
-        { id: 'pic3', type: 'picture', tags: ['Craft', 'Detail'], url: 'pic3.png' },
-        { id: 'pic4', type: 'picture', tags: ['Landscape', 'Night'], url: 'pic4.png' },
-        { id: 'pic5', type: 'picture', tags: ['Night', 'Art'], url: 'pic5.png' },
-        { id: 'pic6', type: 'picture', tags: ['Winter', 'House'], url: 'pic6.png' },
-        { id: 'pic7', type: 'picture', tags: ['Figures', 'Art'], url: 'pic7.png' },
-        { id: 'pic8', type: 'picture', tags: ['Couple', 'Style'], url: 'pic8.png' },
-        // ========== 迪士尼公主风素材（路径已修正为根目录） ==========
         {
             id: 'princess1',
             type: 'disney-princess',
@@ -219,7 +197,7 @@
         }
     });
 
-    // 修复版网格渲染，完美兼容图片+视频
+    // 网格渲染：兼容图片+视频
     function renderGrid() {
         grid.innerHTML = '';
         let filteredData = inspirationData.filter(item => {
@@ -245,6 +223,7 @@
         });
     }
 
+    // 筛选标签渲染
     function renderTags() {
         tagsContainer.innerHTML = '';
         allTags.forEach(tag => {
@@ -264,6 +243,7 @@
         });
     }
 
+    // 左侧分类按钮点击筛选
     catBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
             catBtns.forEach(b => b.classList.remove('active'));
@@ -275,6 +255,7 @@
         });
     });
 
+    // 右侧筛选抽屉开关
     function toggleFilterDrawer(show) {
         if(show) { rightFilter.classList.add('active'); overlay.classList.add('active'); document.body.style.overflow = 'hidden'; } 
         else { rightFilter.classList.remove('active'); overlay.classList.remove('active'); document.body.style.overflow = 'auto'; }
@@ -283,7 +264,7 @@
     document.getElementById('closeFilterBtn').onclick = () => toggleFilterDrawer(false);
     overlay.onclick = () => toggleFilterDrawer(false);
 
-    // 修复弹窗视频/图片切换逻辑
+    // 弹窗大图/视频预览逻辑
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightboxImg');
     const lightboxText = document.getElementById('lightboxText');
@@ -323,6 +304,7 @@
         document.body.style.overflow = 'hidden';
     }
 
+    // 关闭弹窗
     document.getElementById('closeLightbox').onclick = () => {
         lightbox.classList.remove('active');
         const mediaBox = document.querySelector('.lightbox-image-box');
@@ -331,7 +313,7 @@
         document.body.style.overflow = 'auto';
     }
 
-    // 初始化渲染
+    // 页面初始化加载
     renderTags();
     renderGrid();
 </script>
