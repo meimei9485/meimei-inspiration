@@ -35,6 +35,10 @@
         .category-nav button { font-size: 0.9rem; letter-spacing: 0.15em; color: var(--text-light); text-transform: uppercase; transition: all 0.3s ease; position: relative; }
         .category-nav button:hover, .category-nav button.active { color: var(--text-main); font-weight: 500; }
         .category-nav button.active::before { content: ''; position: absolute; left: -15px; top: 50%; transform: translateY(-50%); width: 8px; height: 1px; background-color: var(--text-main); }
+        /* 二级子菜单样式 */
+        .sub-menu { display: flex; flex-direction: column; gap: 1.2rem; margin-left: 18px; display: none; }
+        .sub-menu.show { display: flex; }
+        .sub-menu button { font-size: 0.8rem; }
 
         /* 中间主视区 */
         .main-content { margin-left: var(--left-sidebar-width); padding: 4rem 3rem; width: calc(100% - var(--left-sidebar-width)); transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -103,9 +107,27 @@
         <aside class="left-sidebar" id="leftSidebar">
             <nav class="category-nav">
                 <button class="cat-btn active" data-cat="all">ALL</button>
-                <button class="cat-btn" data-cat="picture">PICTURES</button>
-                <!-- 迪士尼公主风导航按钮 -->
-                <button class="cat-btn" data-cat="disney-princess">DISNEY PRINCESS STYLE</button>
+
+                <!-- 一级：LOOKBOOK COLLECTION + 二级子菜单 LOOK1~LOOK7 -->
+                <button class="cat-btn parent-btn" data-parent="lookbook">LOOKBOOK COLLECTION</button>
+                <div class="sub-menu" id="lookbook-sub">
+                    <button class="cat-btn sub-btn" data-cat="look1">LOOK 1</button>
+                    <button class="cat-btn sub-btn" data-cat="look2">LOOK 2</button>
+                    <button class="cat-btn sub-btn" data-cat="look3">LOOK 3</button>
+                    <button class="cat-btn sub-btn" data-cat="look4">LOOK 4</button>
+                    <button class="cat-btn sub-btn" data-cat="look5">LOOK 5</button>
+                    <button class="cat-btn sub-btn" data-cat="look6">LOOK 6</button>
+                    <button class="cat-btn sub-btn" data-cat="look7">LOOK 7</button>
+                </div>
+
+                <!-- 一级：AESTHETIC COLLECTION + 二级子菜单 Floral -->
+                <button class="cat-btn parent-btn" data-parent="aesthetic">AESTHETIC COLLECTION</button>
+                <div class="sub-menu" id="aesthetic-sub">
+                    <button class="cat-btn sub-btn" data-cat="floral">FLORAL</button>
+                </div>
+
+                <!-- 一级：VISUAL 无二级子菜单 -->
+                <button class="cat-btn" data-cat="visual">VISUAL INSPIRATIONS COLLECTION</button>
             </nav>
         </aside>
 
@@ -138,56 +160,108 @@
     </div>
 
 <script>
-    // === 核心数据区：仅保留可用的迪士尼公主素材，删除全部失效pic1-pic8 ===
+    // === 核心素材数据，绑定细分分类 ===
     const inspirationData = [
+        // LOOK1 素材
         {
-            id: 'princess1',
-            type: 'disney-princess',
-            tags: ['Disney Princess', 'Princess Makeup', 'Pink Aesthetic', 'Lolita'],
-            url: 'makeup.jpeg',
-            title: 'Princess Romantic Makeup',
+            id: 'look1-1',
+            type: 'look1',
+            tags: ['Look1', 'Outfit', 'Sweet Princess', 'Daily Wear'],
+            url: 'look101.mp4',
+            title: 'Look 1 Outfit Video',
             details: [
-                { title: '风格主题', desc: '迪士尼公主温柔甜妆，粉调腮红+大朵玫瑰发饰，复古柔焦少女氛围感。' },
-                { title: '适用场景', desc: '公主风钻石画、洛丽塔穿搭参考、少女手作灵感。' }
+                { title: '造型灵感', desc: '甜系公主日常穿搭，温柔少女感成套造型参考' },
+                { title: '适用方向', desc: '穿搭钻石画、服装手作、少女造型灵感参考' }
             ]
         },
         {
-            id: 'princess2',
-            type: 'disney-princess',
-            tags: ['Disney Princess', 'Princess Dress', 'Pink Gown', 'Vintage'],
-            url: 'dress.mp4',
-            title: 'Vintage Princess Dress Display',
+            id: 'look1-2',
+            type: 'look1',
+            tags: ['Look1', 'Outfit', 'Sweet Princess', 'Daily Wear'],
+            url: 'look102.jpeg',
+            title: 'Look 1 Outfit Reference',
             details: [
-                { title: '风格主题', desc: '复古粉白泡泡袖公主礼裙，褶皱蕾丝设计，经典迪士尼公主裙版型参考。' },
-                { title: '适用场景', desc: '服装钻石画、布艺手工、少女软装设计素材。' }
+                { title: '造型灵感', desc: 'Look1完整穿搭人像造型，柔焦复古少女妆容搭配' },
+                { title: '适用方向', desc: '人物插画、妆造、穿搭设计素材' }
+            ]
+        },
+        // LOOK2 素材
+        {
+            id: 'look2-1',
+            type: 'look2',
+            tags: ['Look2', 'Outfit', 'Vintage Lolita', 'Floral Dress'],
+            url: 'look201.mp4',
+            title: 'Look 2 Vintage Dress Video',
+            details: [
+                { title: '造型灵感', desc: '复古洛丽塔碎花长裙成套穿搭展示' },
+                { title: '适用方向', desc: '复古礼服、碎花元素设计灵感' }
             ]
         },
         {
-            id: 'princess3',
-            type: 'disney-princess',
-            tags: ['Disney Princess', 'Princess Hairstyle', 'Floral Hair', 'Cute'],
-            url: 'hairstyle.mp4',
-            title: 'Floral Princess Hairstyle',
+            id: 'look2-2',
+            type: 'look2',
+            tags: ['Look2', 'Outfit', 'Vintage Lolita', 'Floral Dress'],
+            url: 'look202.jpeg',
+            title: 'Look 2 Floral Hairstyle',
             details: [
-                { title: '风格主题', desc: '温柔大波浪鲜花公主发型，浅棕渐变发色，田园童话公主造型。' },
-                { title: '适用场景', desc: '人物钻石画发型参考、少女妆造手作灵感。' }
+                { title: '造型灵感', desc: 'Look2配套鲜花大波浪公主发型参考' },
+                { title: '适用方向', desc: '人物发型、田园风少女造型素材' }
+            ]
+        },
+        // Floral氛围感素材
+        {
+            id: 'floral-1',
+            type: 'floral',
+            tags: ['Floral', 'Soft Aesthetic', 'Pink Tone', 'Botanic'],
+            url: 'floral1.mp4',
+            title: 'Soft Pink Floral Scene 1',
+            details: [
+                { title: '氛围主题', desc: '低饱和粉调花卉柔焦氛围感场景' },
+                { title: '适用方向', desc: '背景素材、治愈系装饰画、软装灵感' }
+            ]
+        },
+        {
+            id: 'floral-2',
+            type: 'floral',
+            tags: ['Floral', 'Soft Aesthetic', 'Pink Tone', 'Botanic'],
+            url: 'floral2.mp4',
+            title: 'Soft Pink Floral Scene 2',
+            details: [
+                { title: '氛围主题', desc: '朦胧鲜花梦幻氛围感镜头素材' },
+                { title: '适用方向', desc: '插画背景、少女风手工创作参考' }
+            ]
+        },
+        // Visual拍照灵感
+        {
+            id: 'visual-1',
+            type: 'visual',
+            tags: ['Photo Reference', 'Shooting Angle', 'Soft Light', 'Portrait'],
+            url: 'photo1.png',
+            title: 'Soft Portrait Shooting Reference',
+            details: [
+                { title: '视觉灵感', desc: '柔和自然光人像拍摄构图、角度参考图' },
+                { title: '适用方向', desc: '人像摄影、画面构图、光影钻石画素材' }
             ]
         }
     ];
 
     const grid = document.getElementById('grid');
     const tagsContainer = document.getElementById('tagsContainer');
-    const catBtns = document.querySelectorAll('.cat-btn');
+    const allCatBtns = document.querySelectorAll('.cat-btn');
+    const parentBtns = document.querySelectorAll('.parent-btn');
     const toggleLeftBtn = document.getElementById('toggleLeftBtn');
     const leftSidebar = document.getElementById('leftSidebar');
     const mainContent = document.getElementById('mainContent');
     const rightFilter = document.getElementById('rightFilter');
     const overlay = document.getElementById('overlay');
+    const lookbookSub = document.getElementById('lookbook-sub');
+    const aestheticSub = document.getElementById('aesthetic-sub');
 
     let currentCategory = 'all';
     let currentTag = '';
     const allTags = [...new Set(inspirationData.flatMap(item => item.tags))];
 
+    // 侧边栏展开/收起
     toggleLeftBtn.addEventListener('click', () => {
         if (window.innerWidth <= 768) {
             leftSidebar.style.transform = leftSidebar.style.transform === 'translateX(0px)' ? 'translateX(-100%)' : 'translateX(0px)';
@@ -197,7 +271,34 @@
         }
     });
 
-    // 网格渲染：兼容图片+视频
+    // 一级菜单点击：展开对应子菜单，收起其他子菜单
+    parentBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const parentId = btn.dataset.parent;
+            // 先收起全部子菜单
+            lookbookSub.classList.remove('show');
+            aestheticSub.classList.remove('show');
+            // 展开当前对应子菜单
+            if(parentId === 'lookbook') lookbookSub.classList.add('show');
+            if(parentId === 'aesthetic') aestheticSub.classList.add('show');
+        })
+    })
+
+    // 分类按钮通用点击逻辑（一级ALL / 二级子菜单 / Visual）
+    allCatBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            // 清空所有激活状态
+            allCatBtns.forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            // 切换筛选分类
+            currentCategory = e.target.dataset.cat;
+            currentTag = '';
+            document.querySelectorAll('.tags button').forEach(b => b.classList.remove('active'));
+            renderGrid();
+        });
+    })
+
+    // 网格渲染：自动区分图片/视频渲染
     function renderGrid() {
         grid.innerHTML = '';
         let filteredData = inspirationData.filter(item => {
@@ -223,7 +324,7 @@
         });
     }
 
-    // 筛选标签渲染
+    // 右侧标签筛选渲染
     function renderTags() {
         tagsContainer.innerHTML = '';
         allTags.forEach(tag => {
@@ -243,19 +344,7 @@
         });
     }
 
-    // 左侧分类按钮点击筛选
-    catBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            catBtns.forEach(b => b.classList.remove('active'));
-            e.target.classList.add('active');
-            currentCategory = e.target.dataset.cat;
-            currentTag = '';
-            document.querySelectorAll('.tags button').forEach(b => b.classList.remove('active'));
-            renderGrid();
-        });
-    });
-
-    // 右侧筛选抽屉开关
+    // 筛选抽屉开关
     function toggleFilterDrawer(show) {
         if(show) { rightFilter.classList.add('active'); overlay.classList.add('active'); document.body.style.overflow = 'hidden'; } 
         else { rightFilter.classList.remove('active'); overlay.classList.remove('active'); document.body.style.overflow = 'auto'; }
@@ -304,7 +393,7 @@
         document.body.style.overflow = 'hidden';
     }
 
-    // 关闭弹窗
+    // 关闭弹窗，销毁视频停止播放
     document.getElementById('closeLightbox').onclick = () => {
         lightbox.classList.remove('active');
         const mediaBox = document.querySelector('.lightbox-image-box');
@@ -313,7 +402,7 @@
         document.body.style.overflow = 'auto';
     }
 
-    // 页面初始化加载
+    // 页面初始化渲染
     renderTags();
     renderGrid();
 </script>
