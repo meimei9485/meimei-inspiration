@@ -108,14 +108,17 @@
                     <button class="cat-btn sub-btn" data-cat="look7">LOOK 7</button>
                 </div>
 
-                <button class="cat-btn" data-cat="redcarpet">RED CARPET</button>
+                <button class="cat-btn parent-btn" data-parent="redcarpet">RED CARPET</button>
+                <div class="sub-menu" id="redcarpet-sub">
+                    <button class="cat-btn sub-btn" data-cat="zendaya">ZENDAYA</button>
+                </div>
 
                 <button class="cat-btn parent-btn" data-parent="aesthetic">AESTHETIC</button>
                 <div class="sub-menu" id="aesthetic-sub">
                     <button class="cat-btn sub-btn" data-cat="floral">FLORAL</button>
                 </div>
 
-                <button class="cat-btn" data-cat="visual">VISUAL INSPIRATIONS</button>
+                <button class="cat-btn" data-cat="photo">PHOTO</button>
             </nav>
         </aside>
 
@@ -193,12 +196,28 @@ const inspirationData = [
         referenceLink: 'Some videos from my work 👼🏻 http://xhslink.cn/o/50IW17fFRKu 内容复制后，前往【小红书】直接打开笔记。'
     },
     {
-        id: 'visual-1',
-        type: 'visual',
+        id: 'photo-1',
+        type: 'photo',
         tags: ['Photo'],
         url: 'photo1.png',
         inspirationBits: '拍照构图灵感\nBGM配乐，极为重要',
         referenceLink: '2.30 复制打开抖音，看看【伤心网友小王的图文作品】触不可及刚刚好 日久天长惹人恼  https://v.douyin.com/kuQ3i_4U50o/ O@X.ZZ VlP:/ 12/25 :5pm'
+    },
+    {
+        id: 'photo-2',
+        type: 'photo',
+        tags: ['Photo'],
+        url: 'photo2.png',
+        inspirationBits: '~',
+        referenceLink: '7.48 复制打开抖音，看看【Ivyyy.的图文作品】想在你身边  https://v.douyin.com/3pD4jpZGWW4/ 09/16 :1pm X@z.gb yte:/'
+    },
+    {
+        id: 'zendaya-1',
+        type: 'zendaya',
+        tags: ['Zendaya'],
+        url: 'Zendayalook1',
+        inspirationBits: '造型灵感、妆容灵感、表情管理',
+        referenceLink: '赞达亚最美的造型永远是下一套🪽✨ 昨天出席《奥德赛... http://xhslink.cn/o/5UwiXa1QH57 存好这段，去【小红书】逛逛笔记~'
     }
 ];
 
@@ -213,6 +232,7 @@ const rightFilter = document.getElementById('rightFilter');
 const overlay = document.getElementById('overlay');
 const lookbookSub = document.getElementById('lookbook-sub');
 const aestheticSub = document.getElementById('aesthetic-sub');
+const redcarpetSub = document.getElementById('redcarpet-sub');
 const lightbox = document.getElementById('lightbox');
 const lbMediaBox = document.getElementById('lbMediaBox');
 const lightboxText = document.getElementById('lightboxText');
@@ -234,9 +254,11 @@ parentBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         lookbookSub.classList.remove('show');
         aestheticSub.classList.remove('show');
+        redcarpetSub.classList.remove('show');
         const p = btn.dataset.parent;
         if(p === 'lookbook') lookbookSub.classList.add('show');
         if(p === 'aesthetic') aestheticSub.classList.add('show');
+        if(p === 'redcarpet') redcarpetSub.classList.add('show');
     })
 })
 
